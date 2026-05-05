@@ -53,6 +53,7 @@ app.add_middleware(
 
 class AnalyseRequest(BaseModel):
     text: str
+    target_language: str = "English"
 
 
 class AnalyseResponse(BaseModel):
@@ -88,7 +89,7 @@ async def analyse_meeting(req: AnalyseRequest):
 
     # ── Step 2: AI Reframing (Gemini/Groq) ───────────────
     try:
-        refined = refine_insights(raw_insights)
+        refined = refine_insights(raw_insights, target_language=req.target_language)
     except Exception as e:
         logger.error("AI reframing failed: %s", e, exc_info=True)
         # Fall back to raw ML results if AI fails

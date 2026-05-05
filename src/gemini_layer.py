@@ -45,7 +45,7 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 #  Prompt Builder
 # ─────────────────────────────────────────────────────────
 
-def _build_prompt(raw_insights: dict) -> str:
+def _build_prompt(raw_insights: dict, target_language: str = "English") -> str:
     """Build the AI framing prompt from ML-classified data."""
     prompt_data = {
         "decisions": raw_insights.get("decisions", []),
@@ -92,6 +92,7 @@ Rules:
 5. If a section has no items, return an empty list [].
 6. intelligence_score.score: 0 = unproductive, 100 = highly productive.
 7. Do NOT invent information not present in the data.
+8. **IMPORTANT: Generate ALL output text (values of JSON) strictly in {target_language}. Do not use English unless the target language is English.**
 
 ML-Classified Data:
 ```json
@@ -191,7 +192,7 @@ def _fallback_format(raw_insights: dict) -> dict:
 #  Public API
 # ─────────────────────────────────────────────────────────
 
-def refine_insights(raw_insights: dict) -> dict:
+def refine_insights(raw_insights: dict, target_language: str = "English") -> dict:
     """Refine raw ML-classified insights using AI.
 
     Tries Groq first, then Gemini, then falls back to basic formatting.
@@ -199,7 +200,7 @@ def refine_insights(raw_insights: dict) -> dict:
     Returns:
         Structured dict ready for UI display.
     """
-    prompt = _build_prompt(raw_insights)
+    prompt = _build_prompt(raw_insights, target_language)
 
     # 1. Try Groq (primary)
     result = _call_groq(prompt)
@@ -226,7 +227,7 @@ def refine_insights(raw_insights: dict) -> dict:
 #  AI Summary Generation
 # ─────────────────────────────────────────────────────────
 
-def _build_summary_prompt(refined: dict) -> str:
+def _build_summary_prompt(refined: dict, target_language: str = "English") -> str:
     """Build a prompt for generating a structured meeting summary."""
     sections = []
     if refined.get("meeting_title"):
@@ -257,6 +258,7 @@ def _build_summary_prompt(refined: dict) -> str:
 3. Do NOT invent information not present in the data.
 4. Use markdown formatting with headers (##), bullet points, and bold text.
 5. Keep it under 400 words.
+6. **IMPORTANT: Generate ALL output text strictly in {target_language}. Do not use English unless the target language is English.**
 
 **SECTIONS TO INCLUDE (only if data exists):**
 - ## Meeting Overview — Title, participants, brief context
@@ -356,7 +358,7 @@ def _fallback_summary(refined: dict) -> str:
     return "\n".join(parts)
 
 
-def generate_ai_summary(refined: dict) -> str:
+def generate_ai_summary(refined: dict, target_language: str = "English") -> str:
     """Generate a structured AI summary from refined meeting insights.
 
     Tries Gemini first, then Groq, then falls back to basic formatting.
@@ -364,7 +366,7 @@ def generate_ai_summary(refined: dict) -> str:
     Returns:
         Markdown-formatted summary string.
     """
-    prompt = _build_summary_prompt(refined)
+    prompt = _build_summary_prompt(refined, target_language)
 
     # 1. Try Gemini (primary)
     result = _call_gemini_text(prompt)

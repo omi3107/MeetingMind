@@ -313,11 +313,13 @@
             font-size: 14px;
             font-weight: 600;
             color: var(--text);
+            text-align: center;
         }
 
         .drop-sub {
             font-size: 11px;
             color: var(--muted);
+            text-align: center;
         }
 
         .drop-badge {
@@ -2218,6 +2220,16 @@
                 </div>
 
             </div><!-- end input-zone -->
+            <div
+                style="text-align: center; margin-top: 10px; margin-bottom: 15px; font-size: 11px; color: var(--muted); display: flex; align-items: center; justify-content: center; gap: 6px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                Output will be generated in selected language. Language can be changed in settings.
+            </div>
 
             <div class="btn-row">
                 <div class="action-btns" id="actionBtns">
@@ -2240,8 +2252,14 @@
                         </svg>
                         Export
                     </button>
-                    <button class="sm-btn" style="background:rgba(79,142,247,0.12);color:#4f8ef7;border-color:rgba(79,142,247,0.25);" onclick="manualExportToNotion()">
-                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933z"/></svg>
+                    <button class="sm-btn"
+                        style="background:rgba(79,142,247,0.12);color:#4f8ef7;border-color:rgba(79,142,247,0.25);"
+                        onclick="manualExportToNotion()">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path
+                                d="M4.459 4.208c.746.606 1.026.56 2.428.466l13.215-.793c.28 0 .047-.28-.046-.326L17.86 1.968c-.42-.326-.981-.7-2.055-.607L3.01 2.295c-.466.046-.56.28-.374.466zm.793 3.08v13.904c0 .747.373 1.027 1.214.98l14.523-.84c.841-.046.935-.56.935-1.167V6.354c0-.606-.233-.933-.748-.887l-15.177.887c-.56.047-.747.327-.747.933z" />
+                        </svg>
                         Notion
                     </button>
                 </div>
@@ -2490,16 +2508,56 @@
 
         </div><!-- end bottom-row -->
 
-        <!-- OVERLAYS -->
-        <div class="overlay" id="summaryView">
-            <div style="max-width: 800px; margin: 0 auto;">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 20px;">
-                    <h2 style="font-family:'Syne',sans-serif; font-size: 20px;">AI Executive Summary</h2>
-                    <button onclick="setPage('home')" class="sm-btn"
-                        style="width:auto; padding: 6px 14px;">Close</button>
+        <!-- SUMMARY OVERLAY -->
+        <div class="history-overlay" id="summaryView">
+            <div class="hist-topbar">
+                <span class="hist-logo">MeetingMind</span>
+                <div class="hist-search">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8" />
+                        <path d="m21 21-4.3-4.3" />
+                    </svg>
+                    <input type="text" id="sumSearchInput" placeholder="Search meetings to summarize..."
+                        oninput="filterSummary()">
                 </div>
-                <div id="summaryContent" style="color:var(--muted2); line-height: 1.6; font-size: 14px;">
-                    Run analysis to generate a structured insights summary.
+            </div>
+
+            <div class="hist-body">
+                <!-- Left: Card List -->
+                <div class="hist-left">
+                    <div class="hist-left-header">
+                        <div>
+                            <h2>
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                    <polyline points="14 2 14 8 20 8" />
+                                    <line x1="16" y1="13" x2="8" y2="13" />
+                                    <line x1="16" y1="17" x2="8" y2="17" />
+                                    <polyline points="10 9 9 9 8 9" />
+                                </svg>
+                                Select Meeting
+                            </h2>
+                            <div class="hist-count" id="sumCount">0 meetings available</div>
+                        </div>
+                    </div>
+                    <div class="hist-list" id="sumList">
+                        <!-- Cards rendered by JS -->
+                    </div>
+                </div>
+                <!-- Right: Summary Panel -->
+                <div class="hist-right" id="sumRight" style="display:none">
+                    <div class="hist-detail-header" id="sumDetailHeader">
+                        <button class="hist-detail-close"
+                            onclick="document.getElementById('sumRight').style.display='none';sumSelectedId=null;filterSummary();">✕</button>
+                        <div class="hist-detail-title" id="sumTitle">Generating Summary...</div>
+                        <div class="hist-detail-sub" id="sumSubTitle"></div>
+                    </div>
+                    <div class="hist-detail-scroll" id="sumDetailScroll"
+                        style="line-height: 1.6; font-size: 14px; color: var(--text);">
+                        <!-- Animated text goes here -->
+                    </div>
                 </div>
             </div>
         </div>
@@ -2527,7 +2585,8 @@
                         </div>
                         <div class="setting-right">
                             <div class="s-options-group" style="width: 406px;">
-                                <div class="s-opt-btn active" id="themeOptDark" onclick="setAppearance('dark')" style="flex: 1;">
+                                <div class="s-opt-btn active" id="themeOptDark" onclick="setAppearance('dark')"
+                                    style="flex: 1;">
                                     <div class="opt-label">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2537,7 +2596,8 @@
                                     </div>
                                     <div class="s-radio"></div>
                                 </div>
-                                <div class="s-opt-btn" id="themeOptLight" onclick="setAppearance('light')" style="flex: 1;">
+                                <div class="s-opt-btn" id="themeOptLight" onclick="setAppearance('light')"
+                                    style="flex: 1;">
                                     <div class="opt-label">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2555,7 +2615,8 @@
                                     </div>
                                     <div class="s-radio"></div>
                                 </div>
-                                <div class="s-opt-btn" id="themeOptSystem" onclick="setAppearance('system')" style="flex: 1;">
+                                <div class="s-opt-btn" id="themeOptSystem" onclick="setAppearance('system')"
+                                    style="flex: 1;">
                                     <div class="opt-label">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
                                             stroke="currentColor" stroke-width="2" stroke-linecap="round"
@@ -2588,7 +2649,8 @@
                         </div>
                         <div class="setting-right">
                             <div class="s-options-group" style="width: 406px;">
-                                <div class="s-opt-btn" id="exportOptJson" onclick="setExportFormat('json')" style="flex: 1;">
+                                <div class="s-opt-btn" id="exportOptJson" onclick="setExportFormat('json')"
+                                    style="flex: 1;">
                                     <div class="opt-label">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7c5ef7"
                                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2598,7 +2660,8 @@
                                     </div>
                                     <div class="s-radio"></div>
                                 </div>
-                                <div class="s-opt-btn active" id="exportOptMd" onclick="setExportFormat('md')" style="flex: 1;">
+                                <div class="s-opt-btn active" id="exportOptMd" onclick="setExportFormat('md')"
+                                    style="flex: 1;">
                                     <div class="opt-label">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#22d3a5"
                                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -2632,7 +2695,20 @@
                             </div>
                         </div>
                         <div class="setting-right">
-                            <div class="s-select">
+                            <div class="s-select" style="position: relative;">
+                                <select id="languageSelect" onchange="setLanguage(this.value)"
+                                    style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0; cursor:pointer;">
+                                    <option value="en">English</option>
+                                    <option value="hi">Hindi</option>
+                                    <option value="mr">Marathi</option>
+                                    <option value="de">German</option>
+                                    <option value="es">Spanish</option>
+                                    <option value="fr">French</option>
+                                    <option value="ja">Japanese</option>
+                                    <option value="zh-CN">Chinese</option>
+                                    <option value="pt">Portuguese</option>
+                                    <option value="ar">Arabic</option>
+                                </select>
                                 <div style="display:flex; align-items:center; gap:10px;">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -2642,7 +2718,7 @@
                                         <path
                                             d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
                                         </path>
-                                    </svg> English
+                                    </svg> <span id="selectedLanguageText">English</span>
                                 </div>
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -2673,7 +2749,8 @@
                             <div class="setting-right" style="flex-direction: column; align-items: flex-end; gap: 8px;">
                                 <div class="s-toggle" id="notionToggle" onclick="toggleNotionAutoExport()"></div>
                                 <div class="s-status" id="notionStatusWrap">
-                                    <div class="s-dot" id="notionDot"></div> <span id="notionStatusText">Checking...</span>
+                                    <div class="s-dot" id="notionDot"></div> <span
+                                        id="notionStatusText">Checking...</span>
                                 </div>
                             </div>
                         </div>
@@ -2684,7 +2761,10 @@
                                 <line x1="12" y1="16" x2="12" y2="12"></line>
                                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
                             </svg>
-                            <span>You can configure your Notion connection on the <a href="#">integrations</a>
+                            <span>You can configure your Notion connection on the <a href="https://notion.so"
+                                    target="_blank" rel="noopener noreferrer"
+                                    onclick="window.open('https://notion.so', '_blank'); return false;"
+                                    style="color:var(--accent); font-weight:600; text-decoration:none;">Notion</a>
                                 page.</span>
                         </div>
                     </div>
@@ -2825,8 +2905,57 @@
         </div>
 
         <!-- Toast Container -->
-        <div id="toastContainer" style="position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;"></div>
+        <div id="toastContainer"
+            style="position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;pointer-events:none;">
+        </div>
     </div><!-- end app -->
+
+    <!-- Hidden Google Translate Element -->
+    <div id="google_translate_element" style="display:none;"></div>
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+            new google.translate.TranslateElement({ pageLanguage: 'en', autoDisplay: false }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript"
+        src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <style>
+        /* Hide google translate banner and tooltips to keep UI clean */
+        body {
+            top: 0px !important;
+        }
+
+        .goog-te-banner-frame.skiptranslate {
+            display: none !important;
+        }
+
+        .goog-tooltip {
+            display: none !important;
+        }
+
+        .goog-tooltip:hover {
+            display: none !important;
+        }
+
+        .goog-text-highlight {
+            background-color: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+    </style>
 
     <script>
         const state = {
@@ -2888,10 +3017,10 @@
         function updateNotionToggleUI(isOn) {
             const tog = document.getElementById('notionToggle');
             if (tog) tog.classList.toggle('on', isOn);
-            
+
             const dot = document.getElementById('notionDot');
             const txt = document.getElementById('notionStatusText');
-            
+
             if (!isOn) {
                 if (dot) dot.style.background = 'var(--muted)';
                 if (txt) txt.textContent = 'Disconnected';
@@ -2951,7 +3080,10 @@
 
         async function manualExportToNotion() {
             if (!state.result) { showToast('⚠️ Run analysis first', 'warn'); return; }
-            await exportToNotion(state.result);
+            const data = await exportToNotion(state.result);
+            if (data && data.url) {
+                window.open(data.url, '_blank');
+            }
         }
 
         // ── Toast Notification ───────────────────────────────────────────────
@@ -2979,6 +3111,36 @@
             }, 3500);
         }
 
+        // ── SETTINGS: Language ───────────────────────────────────────────────
+        function setLanguage(langCode) {
+            localStorage.setItem('meetingmind_language', langCode);
+            const select = document.getElementById('languageSelect');
+            if (select) {
+                select.value = langCode;
+                const textSpan = document.getElementById('selectedLanguageText');
+                if (textSpan) {
+                    textSpan.textContent = select.options[select.selectedIndex].text;
+                }
+            }
+            triggerGoogleTranslate(langCode);
+        }
+
+        function getLanguageName() {
+            const select = document.getElementById('languageSelect');
+            return select ? select.options[select.selectedIndex].text : 'English';
+        }
+
+        function triggerGoogleTranslate(langCode) {
+            const selectField = document.querySelector("#google_translate_element select");
+            if (selectField) {
+                selectField.value = langCode;
+                selectField.dispatchEvent(new Event('change'));
+            } else {
+                // If Google widget hasn't loaded yet, try again in 500ms
+                setTimeout(() => triggerGoogleTranslate(langCode), 500);
+            }
+        }
+
         // ── SETTINGS: Init on load ───────────────────────────────────────────
         function initSettings() {
             // Appearance
@@ -2994,6 +3156,10 @@
             const savedFmt = getExportFormat();
             document.getElementById('exportOptJson').classList.toggle('active', savedFmt === 'json');
             document.getElementById('exportOptMd').classList.toggle('active', savedFmt === 'md');
+
+            // Language
+            const savedLang = localStorage.getItem('meetingmind_language') || 'en';
+            setLanguage(savedLang);
 
             // Notion toggle
             const notionAuto = localStorage.getItem('meetingmind_notion_auto') === 'true';
@@ -3055,8 +3221,9 @@
         }
 
         function updateSummary(r) {
+            const summaryEl = document.getElementById('summaryContent');
             if (!r) {
-                document.getElementById('summaryContent').innerHTML = 'Run analysis to generate a structured insights summary.';
+                if (summaryEl) summaryEl.innerHTML = 'Run analysis to generate a structured insights summary.';
                 return;
             }
 
@@ -3089,7 +3256,7 @@
             }
 
             html += `</div>`;
-            document.getElementById('summaryContent').innerHTML = html;
+            if (summaryEl) summaryEl.innerHTML = html;
         }
 
         // ── TAB SWITCHING ───────────────────────────────────────────────────
@@ -3178,7 +3345,10 @@
                 const resp = await fetch(backendUrl, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ text: content })
+                    body: JSON.stringify({
+                        text: content,
+                        target_language: getLanguageName()
+                    })
                 });
 
                 if (!resp.ok) {
@@ -3370,9 +3540,11 @@
                 participants: r.participants || [],
                 summary: buildOneLiner(r),
                 decisions: { count: (r.decisions || []).length, items: r.decisions || [] },
-                tasks: { count: (r.tasks || []).length, items: (r.tasks || []).map(t =>
-                    typeof t === 'object' ? { assignee: t.who, task: t.task, due: t.by || null } : { assignee: 'Unassigned', task: String(t), due: null }
-                )},
+                tasks: {
+                    count: (r.tasks || []).length, items: (r.tasks || []).map(t =>
+                        typeof t === 'object' ? { assignee: t.who, task: t.task, due: t.by || null } : { assignee: 'Unassigned', task: String(t), due: null }
+                    )
+                },
                 deadlines: { count: (r.deadlines || []).length, items: r.deadlines || [] },
                 issues: { count: (r.issues || []).length, items: r.issues || [] },
                 general_discussion: { count: (r.general || []).length, items: r.general || [] },
@@ -3462,6 +3634,7 @@
             document.getElementById('settingsView').classList.toggle('active', p === 'settings');
             document.getElementById('historyView').classList.toggle('active', p === 'history');
             if (p === 'history') renderHistoryView();
+            if (p === 'summary') renderSummaryView();
         }
 
         function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
@@ -3768,6 +3941,164 @@
             localStorage.setItem('meetingmind_history', JSON.stringify(h));
             if (histSelectedId === id) { histSelectedId = null; document.getElementById('histRight').style.display = 'none'; }
             filterHistory();
+        }
+        // ── SUMMARY GENERATION ──────────────────────────────────────────────
+        let sumSelectedId = null;
+        let summaryAnimationInterval = null;
+
+        function renderSummaryView() {
+            filterSummary();
+        }
+
+        function filterSummary() {
+            let items = getHistoryStorage();
+            const q = (document.getElementById('sumSearchInput').value || '').toLowerCase();
+
+            if (q) {
+                items = items.filter(m => {
+                    const hay = (m.title + ' ' + (m.participants || []).join(' ')).toLowerCase();
+                    return hay.includes(q);
+                });
+            }
+
+            document.getElementById('sumCount').textContent = items.length + ' meeting' + (items.length !== 1 ? 's' : '') + ' available';
+            renderSummaryCards(items);
+        }
+
+        function renderSummaryCards(items) {
+            const list = document.getElementById('sumList');
+            if (items.length === 0) {
+                list.innerHTML = '<div class="hist-empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/></svg><p>No meetings available to summarize.</p></div>';
+                return;
+            }
+            const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+            list.innerHTML = items.map(m => {
+                const d = new Date(m.date);
+                const sel = m.id === sumSelectedId ? ' selected' : '';
+                return `<div class="hist-card${sel}" onclick="selectSummaryCard('${m.id}')" style="position: relative;">
+                    <div class="hist-card-date"><div class="month">${months[d.getMonth()]}</div><div class="day">${d.getDate()}</div><div class="year">${d.getFullYear()}</div></div>
+                    <div class="hist-card-info" style="flex: 1; padding-right: 140px;">
+                        <div class="hist-card-title">${m.title}</div>
+                        <div class="hist-card-meta"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>${(m.participants || []).join(', ')}</div>
+                    </div>
+                    <button class="sum-generate-btn" onclick="event.stopPropagation(); generateSummary('${m.id}')" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: var(--accent); color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; box-shadow: 0 4px 12px rgba(124, 94, 247, 0.2); transition: all 0.2s;">
+                        Generate Summary
+                    </button>
+                </div>`;
+            }).join('');
+        }
+
+        function selectSummaryCard(id) {
+            sumSelectedId = id;
+            filterSummary(); // re-render to update selected class
+        }
+
+        function generateSummary(id) {
+            sumSelectedId = id;
+            filterSummary(); // update selected state
+
+            const items = getHistoryStorage();
+            const m = items.find(x => x.id === id);
+            if (!m) return;
+
+            const rightPanel = document.getElementById('sumRight');
+            rightPanel.style.display = 'flex';
+
+            document.getElementById('sumTitle').textContent = 'AI Executive Summary';
+            document.getElementById('sumSubTitle').innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/><path d="M3 10h18"/></svg> Generated for: ${m.title}`;
+
+            const contentDiv = document.getElementById('sumDetailScroll');
+            contentDiv.innerHTML = '<div class="typing-indicator" style="font-family: monospace; font-size: 14px; color: var(--accent);">⠋ Analyzing meeting data...</div>';
+
+            if (summaryAnimationInterval) clearInterval(summaryAnimationInterval);
+
+            // Build the formatted summary
+            // Build the formatted summary cleanly with HTML to ensure perfect, compact layout
+            let htmlContent = '';
+
+            // Overview
+            htmlContent += `<div style="margin-bottom: 12px;">
+                <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg> Overview
+                </div>
+                <div style="font-size:13px;color:var(--muted2);line-height:1.4;">This meeting involved <strong style="color:var(--text)">${(m.participants || []).join(', ')}</strong> and achieved an intelligence score of <strong style="color:var(--text)">${m.score || 0}/100</strong>.</div>
+            </div>`;
+
+            if ((m.decisions || []).length > 0) {
+                htmlContent += `<div style="margin-bottom: 12px;">
+                    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4f8ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg> Key Decisions
+                    </div>
+                    <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted2);line-height:1.4;list-style-type:circle;">
+                        ${m.decisions.map(d => `<li style="margin-bottom:2px;">${d}</li>`).join('')}
+                    </ul>
+                </div>`;
+            }
+
+            if ((m.tasks || []).length > 0) {
+                htmlContent += `<div style="margin-bottom: 12px;">
+                    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#7c5ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><circle cx="12" cy="12" r="3"></circle></svg> Action Items
+                    </div>
+                    <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted2);line-height:1.4;list-style-type:circle;">
+                        ${m.tasks.map(t => `<li style="margin-bottom:2px;"><strong style="color:var(--text)">${typeof t === 'object' ? t.who : 'Unassigned'}:</strong> ${typeof t === 'object' ? t.task : t} ${t.by ? `<span style="color:#f7a84f;font-size:11px;">(Due: ${t.by})</span>` : ''}</li>`).join('')}
+                    </ul>
+                </div>`;
+            }
+
+            if ((m.issues || []).length > 0) {
+                htmlContent += `<div style="margin-bottom: 12px;">
+                    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f75e5e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg> Blockers & Issues
+                    </div>
+                    <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted2);line-height:1.4;list-style-type:circle;">
+                        ${m.issues.map(i => `<li style="margin-bottom:2px;">${i}</li>`).join('')}
+                    </ul>
+                </div>`;
+            }
+
+            if ((m.general || []).length > 0) {
+                htmlContent += `<div style="margin-bottom: 12px;">
+                    <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;display:flex;align-items:center;gap:6px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#22d3a5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg> General Discussion
+                    </div>
+                    <ul style="margin:0;padding-left:18px;font-size:13px;color:var(--muted2);line-height:1.4;list-style-type:circle;">
+                        ${m.general.map(g => `<li style="margin-bottom:2px;">${g}</li>`).join('')}
+                    </ul>
+                </div>`;
+            }
+
+            // Animate typing effect safely avoiding breaking HTML tags
+            let i = 0;
+            setTimeout(() => {
+                contentDiv.innerHTML = '';
+
+                summaryAnimationInterval = setInterval(() => {
+                    if (i >= htmlContent.length) {
+                        clearInterval(summaryAnimationInterval);
+                        contentDiv.innerHTML = htmlContent;
+                        return;
+                    }
+
+                    let charsToAdd = 3;
+                    while (charsToAdd > 0 && i < htmlContent.length) {
+                        if (htmlContent[i] === '<') {
+                            let endTag = htmlContent.indexOf('>', i);
+                            if (endTag !== -1) {
+                                i = endTag + 1;
+                            } else {
+                                i++;
+                            }
+                        } else {
+                            i++;
+                            charsToAdd--;
+                        }
+                    }
+
+                    contentDiv.innerHTML = htmlContent.substring(0, i) + '<span style="display:inline-block;width:8px;height:14px;background:var(--accent);vertical-align:middle;margin-left:2px;animation:blink 1s step-end infinite;"></span>';
+
+                }, 10);
+            }, 500);
         }
     </script>
 </body>
