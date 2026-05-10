@@ -1,9 +1,5 @@
 # MeetingMind — System Overview
 
-<p align="center">
-  <img src="image.png" alt="MeetingMind Dashboard" width="100%">
-</p>
-
 > **AI-powered meeting transcript analyser** that combines a custom-trained ML classification pipeline with LLM-based intelligence to extract actionable insights from meeting transcripts.
 
 ---
