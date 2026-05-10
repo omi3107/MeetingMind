@@ -449,11 +449,6 @@ python -m uvicorn backend.api.analysis_server:app --port 8502 --reload
 ```bash
 streamlit run app.py
 ```
-
-### Access
-- **Dashboard**: http://localhost:8501
-- **API docs**: http://localhost:8502/docs
-
 ---
 
 *Last updated: May 2026*
