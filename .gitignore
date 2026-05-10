@@ -18,7 +18,7 @@ venv/
 env/
 
 # ----------------------
-# Environment Variables (IMPORTANT 🔐)
+# Environment Variables 
 # ----------------------
 .env
 .env.*
@@ -28,16 +28,17 @@ env/
 .env.production
 
 # ----------------------
-# IDE / Editor
+# IDE 
 # ----------------------
 .vscode/
 .idea/
 
 # ----------------------
-# AI Assistant / Code Review
+# Instructions
 # ----------------------
 .code-review-graph/
 .claude/
+skills/
 AGENTS.md
 GEMINI.md
 
@@ -46,12 +47,16 @@ GEMINI.md
 # ----------------------
 *.pt
 *.bin
-models/
+saved/
 data/
-github_raw_data/
 transcripts/
+github_raw_data/
 **/checkpoints/
 **/audio_data/
+dl_model/
+balance_dataset.py
+data_generator.py
+generate_dataset.py
 
 # ----------------------
 # Logs & Temp
@@ -93,4 +98,3 @@ history_section.md
 labelling_guidelines.md
 raw_data_format.md
 Auto_export_notion.md
-README.md

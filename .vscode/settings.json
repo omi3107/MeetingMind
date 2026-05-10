@@ -1,9 +1,0 @@
-{
-  "python.analysis.extraPaths": [
-    "./backend/ml_model"
-  ],
-  "python.analysis.autoSearchPaths": true,
-  "python.analysis.diagnosticSeverityOverrides": {
-    "reportMissingModuleSource": "none"
-  }
-}
