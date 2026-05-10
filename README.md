@@ -1,5 +1,9 @@
 # MeetingMind — System Overview
 
+<p align="center">
+  <img src="image.png" alt="MeetingMind Dashboard" width="100%">
+</p>
+
 > **AI-powered meeting transcript analyser** that combines a custom-trained ML classification pipeline with LLM-based intelligence to extract actionable insights from meeting transcripts.
 
 ---
@@ -24,7 +28,7 @@
 
 ## 1. Application Summary
 
-**MeetingMind** is a full-stack AI meeting analysis application. Users upload meeting transcripts (PDF, DOCX, TXT, or raw text), and the system:
+**MeetingMind** is a AI meeting analysis application. Users upload meeting transcripts (PDF, DOCX, TXT, or raw text), and the system:
 
 1. **Classifies** each sentence using a trained SVM model into five categories: *Decision*, *Task*, *Deadline*, *Issue*, or *General Discussion*.
 2. **Refines** the ML output using an LLM (Gemini or Groq) to produce clean, professional insights — including participant detection, responsibility mapping, meeting title generation, and an intelligence score.
@@ -36,7 +40,7 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                     FRONTEND (Browser)                          │
+│                     FRONTEND (Streamlit, port 8501)             |             
 │  meetingmind.html — Single-page app served via Streamlit        │
 │  ┌───────────┬────────────┬─────────────┬──────────────────┐    │
 │  │   Home    │  History   │ AI Summary  │    Settings      │    │
@@ -50,25 +54,17 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                   BACKEND (FastAPI, port 8502)                  │
 │                                                                 │
-<<<<<<< HEAD
+|<<<<<<< HEAD                                                     |
 │  POST /api/analyse       ← Full ML + AI pipeline                │
-│  POST /api/extract_text  ← PDF/DOCX/TXT → plain text            │
-=======
-│  POST /api/analyse       ← Full ML + AI pipeline               │
-│  POST /api/extract_text  ← PDF/DOCX/TXT → plain text           │
->>>>>>> 14de0eca5bc20ab674a6fcdda6381fc889915e1c
+│  POST /api/extract_text  ← PDF/DOCX/TXT → plain text            │               
 │  POST /api/export_notion ← Export insights to Notion            │
 │  GET  /api/notion_status ← Check Notion connection              │
 │  GET  /api/health        ← Health check                         │
 │                                                                 │
 │  ┌──────────────────┐    ┌──────────────────────────────────┐   │
-<<<<<<< HEAD
-│  │  ML Pipeline     │───▶│  AI Framing Layer               │    │
+|<<<<<<< HEAD         |    |                                  |   |
+│  │  ML Pipeline     │───▶│  AI Framing Layer               │   │
 │  │  (SVM + TF-IDF)  │    │  (Gemini → Groq → Fallback)      │   │
-=======
-│  │  ML Pipeline     │───▶│  AI Framing Layer                │   │
-│  │  (SVM + TF-IDF)  │    │  (Gemini → Groq → Fallback)     │   │
->>>>>>> 14de0eca5bc20ab674a6fcdda6381fc889915e1c
 │  └──────────────────┘    └──────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
                               │
@@ -76,7 +72,7 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                   EXTERNAL SERVICES                             │
 │  • Google Gemini API (gemini-2.0-flash) — Primary LLM           │
-│  • Groq API (llama-3.3-70b-versatile) — Fallback LLM           │
+│  • Groq API (llama-3.3-70b-versatile) — Fallback LLM            │
 │  • Notion API — Meeting export                                  │
 │  • Google Translate Widget — UI translation                     │
 └─────────────────────────────────────────────────────────────────┘
@@ -95,7 +91,7 @@
 | **NLP**       | NLTK (tokenization, lemmatization, stopwords)                 |
 | **AI/LLM**    | Google Gemini (`google-genai`), Groq (`groq`)                 |
 | **File I/O**  | pdfplumber (PDF), python-docx (DOCX)                          |
-| **Export**     | Notion API via httpx                                          |
+| **Export**     | Notion API via httpx                                         |
 | **Fonts**     | Google Fonts: Syne (headings), DM Sans (body)                 |
 | **Theming**   | CSS custom properties with light/dark mode support            |
 
@@ -103,61 +99,55 @@
 
 ## 4. Project Structure
 
+```text
+MeetingMind/
+├── .gitignore                   # Specifies intentionally untracked files to ignore
+├── README.md                    # Project overview and setup instructions
+├── app.py                       # Main Streamlit frontend application
+├── config.py                    # Global configuration and environment settings
+├── meetingmind.html             # Static HTML template or UI export
+├── pyrightconfig.json           # Type-checking configuration for Pyright
+├── requirements.txt             # Python package dependencies
+├── github_raw_data/             # External research data (AMI, Google, MeetingBank) for creating labelled_data.csv
+├── backend/                     # Backend services and machine learning pipeline
+│   ├── __init__.py
+│   ├── api/                     # FastAPI server and external integrations
+│   │   ├── analysis_server.py   # API server handling backend requests
+│   │   └── notion_export.py     # Handles exporting insights to Notion
+│   └── ml_model/                # Custom ML classification pipeline
+│       ├── __init__.py
+│       ├── dataset/             # Dataset management
+│       │   └── labelled_data.csv # The labelled dataset used for training
+│       ├── inference/           # Scripts for making predictions
+│       │   ├── __init__.py
+│       │   └── predict_text.py  # Runs new text through the trained model
+│       ├── models/              # Model definitions and vectorization
+│       │   ├── __init__.py
+│       │   ├── baseline_classifier.py # Linear SVM classifier definition
+│       │   ├── model_utils.py   # Helper functions for the model
+│       │   └── tfidf_vectorizer.py # Converts text into numerical TF-IDF features
+│       ├── preprocessing/       # Text preprocessing logic
+│       │   ├── __init__.py
+│       │   └── text_cleaner.py  # Cleans and sanitizes input text
+│       └── training/            # Scripts to train and evaluate the model
+│           ├── __init__.py
+│           ├── evaluate_baseline.py # Evaluates the model and generates metrics
+│           ├── save_model.py    # Utility to save and load model artifacts
+│           ├── train_baseline.py# The main training script
+│           └── results/         # Saved evaluation plots and visualizations
+│               ├── confusion_matrix.png
+│               ├── label_distribution.png
+│               ├── length_distribution.png
+│               ├── per_class_metrics.png
+│               ├── source_distribution.png
+│               ├── word_clouds.png
+│               └── wordcount_by_label.png
+└── src/                         # Additional core Python modules
+    ├── __init__.py
+    ├── gemini_layer.py          # AI framing layer integrating Gemini/Groq
+    └── insight_extractor.py     # Logic for extracting structured meeting insights
 ```
-MeetingMind-AI-Redesigned/
-│
-├── app.py                          # Streamlit entry point — serves the HTML
-├── config.py                       # Central config (labels, paths, model params)
-├── meetingmind.html                # Complete frontend: HTML + CSS + JS (~4050 lines)
-├── requirements.txt                # Python dependencies (root)
-├── .env                            # API keys (Gemini, Groq, Notion) — gitignored
-├── .gitignore                      # Version control exclusions
-│
-├── src/                            # Source modules
-│   ├── insight_extractor.py        #   ML inference wrapper — sentence classification
-│   └── gemini_layer.py             #   AI framing layer — Gemini/Groq refinement
-│
-├── backend/
-│   ├── api/
-│   │   ├── analysis_server.py      #   FastAPI server — all REST endpoints
-│   │   └── notion_export.py        #   Notion page builder & API client
-│   │
-│   ├── ml_model/                   #   Complete ML pipeline
-│   │   ├── dataset/
-│   │   │   ├── labelled_data.csv   #     Training dataset (~47 MB)
-│   │   │   ├── data_generator.py   #     Synthetic data generation
-│   │   │   ├── generate_dataset.py #     Dataset creation script
-│   │   │   └── balance_dataset.py  #     Class balancing utilities
-│   │   │
-│   │   ├── preprocessing/
-│   │   │   └── text_cleaner.py     #     Text cleaning (lowercase, lemma, stopwords)
-│   │   │
-│   │   ├── models/
-│   │   │   ├── tfidf_vectorizer.py #     TF-IDF vectorizer (unigrams + bigrams)
-│   │   │   ├── baseline_classifier.py #  Linear SVM classifier
-│   │   │   ├── model_utils.py      #     Save/load artifacts (joblib)
-│   │   │   └── saved/              #     Serialized model files (.joblib)
-│   │   │
-│   │   ├── training/
-│   │   │   ├── train_baseline.py   #     Training script with EDA & visualization
-│   │   │   ├── evaluate_baseline.py#     Evaluation metrics (accuracy, F1, confusion)
-│   │   │   ├── save_model.py       #     Model persistence script
-│   │   │   └── results/            #     Training output & plots
-│   │   │
-│   │   └── inference/
-│   │       └── predict_text.py     #     SentenceClassifier class (batch & single)
-│   │
-│   └── dl_model/                   #   Deep learning model (Whisper fine-tune — reserved)
-│       ├── audio_data/
-│       ├── checkpoints/
-│       ├── inference/
-│       ├── training/
-│       └── whisper_finetune/
-│
-├── transcripts/                    # Sample meeting transcripts (PDF, DOCX)
-├── github_raw_data/                # Raw research datasets (AMI, Google, MeetingBank)
-└── history.json                    # Sample history data for development
-```
+
 
 ---
 
@@ -185,7 +175,7 @@ The analysis pipeline follows a three-stage architecture:
 
 ### Stage 3 — AI Framing (`gemini_layer.py`)
 - Takes the raw ML output and a detailed JSON-structured prompt
-- Sends to **Groq** (primary) → **Gemini** (fallback) → **basic formatting** (last resort)
+- Sends to **Gemini** (primary) → **Groq** (fallback) → **basic formatting** (last resort)
 - The LLM refines and returns:
   - Clean, professional bullet points per category
   - **Participant names** extracted from transcript context
@@ -200,6 +190,29 @@ The analysis pipeline follows a three-stage architecture:
 
 The frontend is a single monolithic HTML file (`meetingmind.html`, ~4050 lines) containing all CSS, HTML structure, and JavaScript logic inline.
 
+<table width="100%">
+  <tr>
+    <td width="50%" align="center">
+      <img src="assests/home_view.png" alt="Home View - Analysis Results" width="100%">
+      <br><em>Home View — Analysis Results & Confidence Graph</em>
+    </td>
+    <td width="50%" align="center">
+      <img src="assests/history_section.png" alt="History View" width="100%">
+      <br><em>History View — Browse & Filter Past Meetings</em>
+    </td>
+  </tr>
+  <tr>
+    <td width="50%" align="center">
+      <img src="assests/ai_summary_view.png" alt="AI Executive Summary" width="100%">
+      <br><em>AI Summary — Auto-generated Executive Overview</em>
+    </td>
+    <td width="50%" align="center">
+      <img src="assests/settings_view.png" alt="Settings View" width="100%">
+      <br><em>Settings — Preferences, Theme & Notion Export</em>
+    </td>
+  </tr>
+</table>
+
 ### Navigation (Left Sidebar)
 | Icon | Section | Description |
 |------|---------|-------------|
@@ -211,7 +224,7 @@ The frontend is a single monolithic HTML file (`meetingmind.html`, ~4050 lines) 
 ### Home View
 - **File upload zone**: Drag & drop or click to upload (PDF, DOCX, TXT; max 10 MB)
 - **Text input tab**: Paste raw transcript text directly
-- **Analysis pipeline indicators**: Visual step pills (Classification → Entity Extraction → Report Generated)
+- **Analysis pipeline indicators**: Visual step pills (Input Loaded → Classification → Entity Extraction → Report Generated)
 - **Results display**: After analysis, shows:
   - Meeting title
   - Participant list
@@ -221,7 +234,7 @@ The frontend is a single monolithic HTML file (`meetingmind.html`, ~4050 lines) 
   - Confidence level (line graph visualization)
   - Quality tags (e.g., "Structured", "Action-Heavy", "High Risk")
 - **Export buttons**: New Analysis, Export (JSON/MD), Notion export
-- **Language note**: Indicates output will be generated in selected language
+- **Language note**: Indicates output will be generated in the selected language
 
 ### History View
 - Split-pane layout: meeting list (left) + detail panel (right)
@@ -235,7 +248,7 @@ The frontend is a single monolithic HTML file (`meetingmind.html`, ~4050 lines) 
 - Split-pane layout matching History
 - Search bar for filtering meetings
 - "Generate Summary" button on each meeting card
-- Right panel shows AI-generated summary with **typing animation** (Claude-style streaming effect)
+- Right panel shows AI-generated summary with **typing animation** 
 - Summary is structured with colored section headers:
   - 📄 Overview (participants, score)
   - ✅ Key Decisions
@@ -248,7 +261,7 @@ The frontend is a single monolithic HTML file (`meetingmind.html`, ~4050 lines) 
 - **Appearance**: Light / Dark / System mode toggle
 - **Export format**: JSON or Markdown (default for downloads)
 - **Language**: Dropdown with 10 supported languages (English, Hindi, Spanish, French, German, Japanese, Chinese, Korean, Arabic, Portuguese)
-- **Auto-export to Notion**: Toggle to automatically push analyses to Notion
+- **Auto-export to Notion**: Toggle to automatically push analysis to Notion
 
 ### Design System
 - **Color palette**: Custom dark theme with CSS custom properties (`--bg`, `--accent`, `--success`, etc.)
@@ -321,8 +334,9 @@ Raw Text → Sentence Tokenization (NLTK) → Text Cleaning → TF-IDF Vectoriza
 | `General` | General discussion, context, or filler |
 
 ### Training Data
-- Located at `backend/ml_model/dataset/labelled_data.csv` (~47 MB)
-- Includes synthetic data generation (`data_generator.py`) and class balancing (`balance_dataset.py`)
+- Utilizes raw meeting data from github_raw_data/ (AMI, Google, and MeetingBank) for benchmarking and training validation.   
+- Labelled dataset located at `backend/ml_model/dataset/labelled_data.csv` 
+- Includes synthetic data generation and class balancing
 - Training script: `training/train_baseline.py` (includes EDA, visualization, cross-validation)
 - Evaluation: `training/evaluate_baseline.py` (accuracy, precision, recall, F1, confusion matrix)
 
@@ -332,6 +346,32 @@ Stored in `backend/ml_model/models/saved/`:
 - `svm_classifier.joblib`
 - `label_encoder.joblib`
 
+### Pipeline Execution (CLI)
+<table width="100%">
+  <tr>
+    <td width="33%" align="center">
+      <img src="assests/cli1.png" alt="CLI Output 1" width="100%">
+    </td>
+    <td width="33%" align="center">
+      <img src="assests/cli2.png" alt="CLI Output 2" width="100%">
+    </td>
+    <td width="33%" align="center">
+      <img src="assests/cli3.png" alt="CLI Output 3" width="100%">
+    </td>
+  </tr>
+  <tr>
+    <td width="33%" align="center">
+      <img src="assests/cli4.png" alt="CLI Output 4" width="100%">
+    </td>
+    <td width="33%" align="center">
+      <img src="assests/cli5.png" alt="CLI Output 5" width="100%">
+    </td>
+    <td width="33%" align="center">
+      <img src="assests/cli6.png" alt="CLI Output 6" width="100%">
+    </td>
+  </tr>
+</table>
+
 ---
 
 ## 9. AI Framing Layer
@@ -340,8 +380,8 @@ Stored in `backend/ml_model/models/saved/`:
 Transforms raw ML-classified output into clean, professional, display-ready content using LLMs.
 
 ### Provider Priority
-1. **Groq** (primary) — `llama-3.3-70b-versatile`, temperature 0.3
-2. **Gemini** (fallback) — `gemini-2.0-flash`
+1. **Gemini** (primary) — `gemini-2.0-flash`
+2. **Groq** (fallback) — `llama-3.3-70b-versatile`, temperature 0.3 
 3. **Basic formatting** (last resort) — Returns raw ML output without refinement
 
 ### Capabilities
@@ -397,6 +437,9 @@ Frontend receives JSON → renders dashboard
 ## 11. External Integrations
 
 ### Notion Export
+
+<img src="assests/notion_export.png" alt="Notion Export Example" width="100%">
+
 - **Module**: `backend/api/notion_export.py`
 - Creates formatted Notion pages with headings, tables, bullet lists, callouts, and dividers
 - Supports automatic export on analysis completion (toggle in Settings)
@@ -449,11 +492,6 @@ python -m uvicorn backend.api.analysis_server:app --port 8502 --reload
 ```bash
 streamlit run app.py
 ```
-
-### Access
-- **Dashboard**: http://localhost:8501
-- **API docs**: http://localhost:8502/docs
-
 ---
 
 *Last updated: May 2026*
