@@ -50,15 +50,25 @@
 ┌─────────────────────────────────────────────────────────────────┐
 │                   BACKEND (FastAPI, port 8502)                  │
 │                                                                 │
+<<<<<<< HEAD
 │  POST /api/analyse       ← Full ML + AI pipeline                │
 │  POST /api/extract_text  ← PDF/DOCX/TXT → plain text            │
+=======
+│  POST /api/analyse       ← Full ML + AI pipeline               │
+│  POST /api/extract_text  ← PDF/DOCX/TXT → plain text           │
+>>>>>>> 14de0eca5bc20ab674a6fcdda6381fc889915e1c
 │  POST /api/export_notion ← Export insights to Notion            │
 │  GET  /api/notion_status ← Check Notion connection              │
 │  GET  /api/health        ← Health check                         │
 │                                                                 │
 │  ┌──────────────────┐    ┌──────────────────────────────────┐   │
+<<<<<<< HEAD
 │  │  ML Pipeline     │───▶│  AI Framing Layer               │    │
 │  │  (SVM + TF-IDF)  │    │  (Gemini → Groq → Fallback)      │   │
+=======
+│  │  ML Pipeline     │───▶│  AI Framing Layer                │   │
+│  │  (SVM + TF-IDF)  │    │  (Gemini → Groq → Fallback)     │   │
+>>>>>>> 14de0eca5bc20ab674a6fcdda6381fc889915e1c
 │  └──────────────────┘    └──────────────────────────────────┘   │
 └─────────────────────────────────────────────────────────────────┘
                               │
