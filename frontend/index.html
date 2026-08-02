@@ -2136,17 +2136,25 @@
                 flex-wrap: wrap;
                 margin-top: 5px;
             }
+            .setting-card {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 16px;
+            }
             .setting-card-inner {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 16px;
+            }
+            .setting-left {
+                width: 100%;
             }
             .setting-right {
                 width: 100%;
             }
             .s-options-group {
                 flex-wrap: wrap;
-                width: 100%;
+                width: 100% !important;
             }
             .s-opt-btn {
                 flex: 1;
@@ -2164,7 +2172,7 @@
             }
             .center-pane {
                 width: 100%;
-                min-height: 400px;
+                min-height: 0;
                 border-right: none;
             }
             .top-bar {
@@ -2177,7 +2185,7 @@
             .bottom-col {
                 border-right: none;
                 border-bottom: 1px solid var(--border);
-                min-height: 250px;
+                min-height: 0;
             }
             .right-panel {
                 position: fixed;
@@ -2778,7 +2786,7 @@
                             </div>
                         </div>
                         <div class="setting-right">
-                            <div class="s-options-group" style="width: 406px;">
+                            <div class="s-options-group" style="width: 100%; max-width: 406px;">
                                 <div class="s-opt-btn active" id="themeOptDark" onclick="setAppearance('dark')"
                                     style="flex: 1;">
                                     <div class="opt-label">
@@ -2842,7 +2850,7 @@
                             </div>
                         </div>
                         <div class="setting-right">
-                            <div class="s-options-group" style="width: 406px;">
+                            <div class="s-options-group" style="width: 100%; max-width: 406px;">
                                 <div class="s-opt-btn" id="exportOptJson" onclick="setExportFormat('json')"
                                     style="flex: 1;">
                                     <div class="opt-label">
