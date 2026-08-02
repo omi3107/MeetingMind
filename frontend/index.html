@@ -2042,6 +2042,34 @@
         }
         .mobile-details-btn { display: none; }
         .overlay-backdrop { display: none; }
+        .close-details-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            padding: 4px;
+            align-items: center;
+        }
+        .sum-generate-btn {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(124, 94, 247, 0.2);
+            transition: all 0.2s;
+        }
+        .sum-generate-btn:hover { opacity: 0.9; }
         @media (max-width: 850px) {
             html, body {
                 height: auto;
@@ -2079,7 +2107,7 @@
                 padding: 10px;
                 width: 100%;
             }
-            .history-overlay {
+            .history-overlay, .overlay {
                 position: fixed;
                 top: 0;
                 left: 60px;
@@ -2089,6 +2117,28 @@
                 grid-column: unset;
                 grid-row: unset;
                 border-left: 1px solid var(--border);
+                background: var(--bg);
+                padding: 15px;
+            }
+            .hist-topbar {
+                padding: 10px 5px;
+            }
+            .hist-card.summary-card {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .summary-card .hist-card-info {
+                padding-right: 0 !important;
+                margin-bottom: 12px;
+            }
+            .sum-generate-btn {
+                position: static;
+                transform: none;
+                align-self: stretch;
+                justify-content: center;
+            }
+            .close-details-btn {
+                display: flex !important;
             }
             .center-pane {
                 width: 100%;
@@ -2393,7 +2443,12 @@
 
         <!-- RIGHT PANEL -->
         <div class="right-panel">
-            <div class="panel-header">Details Card</div>
+            <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
+                Details Card
+                <button class="close-details-btn" onclick="toggleDetailsDrawer(false)">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
             <div class="panel-scroll">
 
                 <div>
@@ -4104,13 +4159,13 @@
             list.innerHTML = items.map(m => {
                 const d = new Date(m.date);
                 const sel = m.id === sumSelectedId ? ' selected' : '';
-                return `<div class="hist-card${sel}" onclick="selectSummaryCard('${m.id}')" style="position: relative;">
+                return `<div class="hist-card summary-card${sel}" onclick="selectSummaryCard('${m.id}')" style="position: relative;">
                     <div class="hist-card-date"><div class="month">${months[d.getMonth()]}</div><div class="day">${d.getDate()}</div><div class="year">${d.getFullYear()}</div></div>
                     <div class="hist-card-info" style="flex: 1; padding-right: 140px;">
                         <div class="hist-card-title">${m.title}</div>
                         <div class="hist-card-meta"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>${(m.participants || []).join(', ')}</div>
                     </div>
-                    <button class="sum-generate-btn" onclick="event.stopPropagation(); generateSummary('${m.id}')" style="position: absolute; right: 16px; top: 50%; transform: translateY(-50%); background: var(--accent); color: white; border: none; padding: 8px 14px; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; display: flex; align-items: center; box-shadow: 0 4px 12px rgba(124, 94, 247, 0.2); transition: all 0.2s;">
+                    <button class="sum-generate-btn" onclick="event.stopPropagation(); generateSummary('${m.id}')">
                         Generate Summary
                     </button>
                 </div>`;
