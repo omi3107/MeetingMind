@@ -29,6 +29,7 @@ scikit-learn
 seaborn
 sentencepiece
 seqeval
+slowapi
 spacy
 streamlit
 torch

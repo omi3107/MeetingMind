@@ -21,10 +21,13 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).resolve().parent.parent.parent / ".env")
-from fastapi import FastAPI, HTTPException, File, UploadFile
+from fastapi import FastAPI, HTTPException, File, UploadFile, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import io
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 
 # ── Path setup ───────────────────────────────────────────
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -41,6 +44,10 @@ logger = logging.getLogger(__name__)
 
 # ── FastAPI app ──────────────────────────────────────────
 app = FastAPI(title="MeetingMind Analysis API", version="1.0")
+
+limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 app.add_middleware(
     CORSMiddleware,
@@ -72,7 +79,8 @@ class AnalyseResponse(BaseModel):
 
 
 @app.post("/api/analyse", response_model=AnalyseResponse)
-async def analyse_meeting(req: AnalyseRequest):
+@limiter.limit("5/minute")
+async def analyse_meeting(request: Request, req: AnalyseRequest):
     """Run the full ML + AI pipeline on a transcript."""
     if not req.text or not req.text.strip():
         raise HTTPException(status_code=400, detail="Empty transcript provided.")
@@ -100,7 +108,8 @@ async def analyse_meeting(req: AnalyseRequest):
     return response
 
 @app.post("/api/extract_text")
-async def extract_text_from_file(file: UploadFile = File(...)):
+@limiter.limit("10/minute")
+async def extract_text_from_file(request: Request, file: UploadFile = File(...)):
     """Extract text from uploaded PDF, DOCX, or TXT file."""
     try:
         content = await file.read()
@@ -270,7 +279,8 @@ class NotionExportRequest(BaseModel):
 
 
 @app.post("/api/export_notion")
-async def export_notion_endpoint(req: NotionExportRequest):
+@limiter.limit("10/minute")
+async def export_notion_endpoint(request: Request, req: NotionExportRequest):
     """Export meeting insights to Notion as a formatted page."""
     try:
         result = await export_to_notion(req.meeting_data)
@@ -285,7 +295,8 @@ async def export_notion_endpoint(req: NotionExportRequest):
 
 
 @app.get("/api/notion_status")
-async def notion_status():
+@limiter.limit("30/minute")
+async def notion_status(request: Request):
     """Check if Notion credentials are configured and valid."""
     result = await check_notion_connection()
     return result
@@ -293,7 +304,8 @@ async def notion_status():
 
 # ── Health check ─────────────────────────────────────────
 @app.get("/api/health")
-async def health():
+@limiter.limit("60/minute")
+async def health(request: Request):
     return {"status": "ok", "pipeline": "ML (SVM) + AI (Gemini/Groq)"}
 
 
