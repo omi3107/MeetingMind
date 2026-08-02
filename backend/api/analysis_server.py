@@ -47,7 +47,7 @@ app = FastAPI(title="MeetingMind Analysis API", version="1.0")
 
 limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)  # type: ignore
 
 app.add_middleware(
     CORSMiddleware,
@@ -118,7 +118,7 @@ async def extract_text_from_file(request: Request, file: UploadFile = File(...))
     try:
         content = await file.read()
         text = ""
-        filename = file.filename.lower()
+        filename = file.filename.lower() if file.filename else ""
         
         if filename.endswith(".pdf"):
             import pdfplumber
