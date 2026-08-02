@@ -2040,6 +2040,8 @@
             background: rgba(255, 255, 255, 0.04);
             border-color: var(--muted);
         }
+        .mobile-details-btn { display: none; }
+        .overlay-backdrop { display: none; }
         @media (max-width: 850px) {
             html, body {
                 height: auto;
@@ -2050,26 +2052,44 @@
                 display: flex;
                 flex-direction: column;
                 height: auto;
+                padding-left: 60px;
+                min-height: 100vh;
             }
             .sidebar {
-                flex-direction: row;
-                width: 100%;
-                padding: 10px 15px;
-                border-right: none;
-                border-bottom: 1px solid var(--border);
-                overflow-x: auto;
+                position: fixed;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                width: 60px;
+                flex-direction: column;
+                padding: 15px 5px;
+                border-right: 1px solid var(--border);
+                border-bottom: none;
+                z-index: 100;
+                background: var(--bg);
                 justify-content: flex-start;
-                gap: 12px;
+                gap: 15px;
             }
             .sidebar-bottom {
-                margin-top: 0;
-                margin-left: auto;
+                margin-top: auto;
+                margin-left: 0;
+                align-self: center;
             }
             .nav-btn {
-                width: auto;
-                height: auto;
-                padding: 8px 12px;
-                flex-direction: row;
+                flex-direction: column;
+                padding: 10px;
+                width: 100%;
+            }
+            .history-overlay {
+                position: fixed;
+                top: 0;
+                left: 60px;
+                right: 0;
+                bottom: 0;
+                z-index: 90;
+                grid-column: unset;
+                grid-row: unset;
+                border-left: 1px solid var(--border);
             }
             .center-pane {
                 width: 100%;
@@ -2078,23 +2098,60 @@
             }
             .bottom-row {
                 grid-template-columns: 1fr;
+                width: 100%;
             }
             .bottom-col {
                 border-right: none;
                 border-bottom: 1px solid var(--border);
                 min-height: 250px;
             }
-            .right-pane {
-                width: 100%;
-                border-left: none;
-                border-top: 1px solid var(--border);
+            .right-panel {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 85%;
+                max-width: 320px;
+                bottom: 0;
+                z-index: 95;
+                background: var(--bg);
+                border-left: 1px solid var(--border);
+                transition: right 0.3s ease;
+                box-shadow: -5px 0 15px rgba(0,0,0,0.5);
+                overflow-y: auto;
+            }
+            .right-panel.open {
+                right: 0;
+            }
+            .mobile-details-btn {
+                display: flex;
+                background: transparent;
+                border: 1px solid var(--border);
+                color: var(--text);
+                padding: 6px 10px;
+                border-radius: 6px;
+                font-size: 11px;
+                font-family: inherit;
+                cursor: pointer;
+                align-items: center;
+                gap: 6px;
+                margin-left: auto;
+            }
+            .overlay-backdrop {
+                display: none;
+                position: fixed;
+                top: 0; bottom: 0; right: 0; left: 60px;
+                background: rgba(0,0,0,0.5);
+                z-index: 94;
+            }
+            .overlay-backdrop.active {
+                display: block;
             }
         }
     </style>
 </head>
 
 <body>
-
+    <div class="overlay-backdrop" id="drawerBackdrop" onclick="toggleDetailsDrawer(false)"></div>
     <div class="app">
 
         <!-- SIDEBAR -->
@@ -2170,6 +2227,14 @@
                         Text
                     </button>
                 </div>
+                <button class="mobile-details-btn" onclick="toggleDetailsDrawer(true)">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/>
+                        <line x1="12" y1="16" x2="12" y2="12"/>
+                        <line x1="12" y1="8" x2="12.01" y2="8"/>
+                    </svg>
+                    Details
+                </button>
             </div>
 
             <div class="input-zone">
@@ -3685,6 +3750,18 @@
             document.getElementById('historyView').classList.toggle('active', p === 'history');
             if (p === 'history') renderHistoryView();
             if (p === 'summary') renderSummaryView();
+        }
+
+        function toggleDetailsDrawer(show) {
+            const panel = document.querySelector('.right-panel');
+            const backdrop = document.getElementById('drawerBackdrop');
+            if (show) {
+                panel.classList.add('open');
+                backdrop.classList.add('active');
+            } else {
+                panel.classList.remove('open');
+                backdrop.classList.remove('active');
+            }
         }
 
         function delay(ms) { return new Promise(r => setTimeout(r, ms)); }
