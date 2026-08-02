@@ -4068,7 +4068,6 @@
                 </div>`;
             }
 
-            // Animate typing effect safely avoiding breaking HTML tags
             let i = 0;
             setTimeout(() => {
                 contentDiv.innerHTML = '';
@@ -4100,6 +4099,101 @@
                 }, 10);
             }, 500);
         }
+
+        // ── STREAMLIT COMPONENT BRIDGE ──────────────────────────────────────
+        const pendingRequests = {};
+        let requestIdCounter = 0;
+
+        function sendMessageToStreamlitClient(type, data) {
+            window.parent.postMessage({
+                isStreamlitMessage: true,
+                type: type,
+                ...data
+            }, "*");
+        }
+
+        const Streamlit = {
+            setComponentValue: function (value) {
+                sendMessageToStreamlitClient("streamlit:setComponentValue", { value: value });
+            },
+            setFrameHeight: function (height) {
+                sendMessageToStreamlitClient("streamlit:setFrameHeight", { height: height });
+            }
+        };
+
+        window.addEventListener("message", function (event) {
+            if (event.data.type === "streamlit:render") {
+                const args = event.data.args;
+                if (args && args.response) {
+                    const reqId = args.response.id;
+                    if (pendingRequests[reqId]) {
+                        if (args.response.error) {
+                            pendingRequests[reqId].reject(new Error(args.response.error));
+                        } else {
+                            pendingRequests[reqId].resolve(args.response.data);
+                        }
+                        delete pendingRequests[reqId];
+                    }
+                }
+            }
+        });
+
+        sendMessageToStreamlitClient("streamlit:componentReady", { apiVersion: 1 });
+        Streamlit.setFrameHeight(650);
+
+        // Override fetch ONLY for backend calls
+        const originalFetch = window.fetch;
+        window.fetch = async function (url, options) {
+            if (typeof url === 'string' && url.includes(':8502')) {
+                return new Promise(async (resolve, reject) => {
+                    const reqId = ++requestIdCounter;
+                    pendingRequests[reqId] = {
+                        resolve: (data) => {
+                            resolve({
+                                ok: true,
+                                json: async () => data
+                            });
+                        },
+                        reject: (err) => {
+                            resolve({
+                                ok: false,
+                                status: 500,
+                                json: async () => ({ detail: err.message })
+                            });
+                        }
+                    };
+
+                    let requestBody = null;
+                    if (options && options.body) {
+                        if (options.body instanceof FormData) {
+                            const file = options.body.get('file');
+                            if (file) {
+                                const base64 = await new Promise(r => {
+                                    const reader = new FileReader();
+                                    reader.onload = () => r(reader.result.split(',')[1]);
+                                    reader.readAsDataURL(file);
+                                });
+                                requestBody = { filename: file.name, file_base64: base64 };
+                            }
+                        } else {
+                            try {
+                                requestBody = JSON.parse(options.body);
+                            } catch (e) {
+                                requestBody = options.body;
+                            }
+                        }
+                    }
+
+                    Streamlit.setComponentValue({
+                        id: reqId,
+                        url: url.split(':8502')[1],
+                        method: options ? options.method : 'GET',
+                        body: requestBody
+                    });
+                });
+            }
+            return originalFetch.apply(this, arguments);
+        };
     </script>
 </body>
 
